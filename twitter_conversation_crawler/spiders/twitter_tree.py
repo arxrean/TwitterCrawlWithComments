@@ -28,6 +28,7 @@ class TwitterTree(scrapy.Spider):
         self.tweet_id = tweet_id
         self.all_articles = []
         self.first_tweet = False
+        self.bad_articles = []
         # remember to set the path of 'geckodriver'
         # if os.path.exists('{}.pkl'.format(tweet_id)):
         #     with open('{}.pkl'.format(tweet_id), 'rb') as f:
@@ -38,7 +39,7 @@ class TwitterTree(scrapy.Spider):
     name = 'twitter_tree'
 
     def parse(self, response):
-        driver = webdriver.Chrome(executable_path='./chromedriver')
+        driver = webdriver.Chrome(executable_path='/home/kzy/Downloads/chromedriver')
         # driver = webdriver.Chrome(
         #         # executable_path='/usr/local/bin/geckodriver')
         #         executable_path='/Users/ziyikou/Downloads/chromedriver')
@@ -146,6 +147,8 @@ class TwitterTree(scrapy.Spider):
                     prev_links = new_links
                     self.all_articles = list(set(self.all_articles))
                     print('article num: {}'.format(len(self.all_articles)))
+                    page.send_keys(Keys.PAGE_DOWN)
+                    time.sleep(0.4)
                     page.send_keys(Keys.PAGE_DOWN)
                     time.sleep(0.4)
 
@@ -345,7 +348,10 @@ class TwitterTree(scrapy.Spider):
                     self.first_tweet = True
                     return []
                 if not self.first_tweet:
+                    self.bad_articles.append(href)
                     return [] 
+                if href in self.bad_articles:
+                    return []
 
                 res.append(href)
 

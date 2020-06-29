@@ -10,7 +10,7 @@ OAUTH_TOKEN = '1247263867954176000-Q8DwLfD6Al5Jx3ibc4q44d1LxNtbtW'
 OAUTH_TOKEN_SECRET = '7C8CsC6RcBlj66b9eitFDHlh5yN75b21fXPqAwajt2kYe'
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-api = tweepy.API(auth)
+api = tweepy.API(auth, wait_on_rate_limit=True)
 
 
 def crawl(line):
@@ -30,11 +30,14 @@ def crawl(line):
 				item, reply = item.split('-')
 				reply = 0 if reply == '' or reply == '0' else int(reply)
 				item = item.split('/')[-1]
-				# if item in all_ids:
-				# 	continue
+				if item in all_ids:
+					continue
 				if item.isdigit():
-					# all_ids.append(item)
-					tweet = api.get_status(item, tweet_mode='extended')._json
+					all_ids.append(item)
+					try:
+						tweet = api.get_status(item, tweet_mode='extended')._json
+					except:
+						continue
 					tweet['reply_count'] = reply
 					with open('{}.json'.format(item), 'w') as f:
 						json.dump(tweet, f)
@@ -45,9 +48,13 @@ def crawl(line):
 
 if __name__ == '__main__':
 	for line in open('twitter_ids.txt', 'r').readlines():
-		# os.mkdir('./result/{}_{}'.format(line.strip().split(' ')[0], line.strip().split(' ')[1]))
-		crawl(line)
 		id, label = line.strip().split(' ')
+		if os.path.exists('./result/{}_{}'.format(id, label)):
+			continue
+		if not id.isdigit():
+			continue
+
+		crawl(line)
 		os.mkdir('./result/{}_{}'.format(id, label))
 		os.mkdir('./result/{}_{}/comments'.format(id, label))
 		os.system('mv *.json ./result/{}_{}/comments'.format(id, label))
