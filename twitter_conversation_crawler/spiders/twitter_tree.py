@@ -39,7 +39,7 @@ class TwitterTree(scrapy.Spider):
     name = 'twitter_tree'
 
     def parse(self, response):
-        driver = webdriver.Chrome(executable_path='/home/kzy/Downloads/chromedriver')
+        driver = webdriver.Chrome(executable_path='./chromedriver')
         # driver = webdriver.Chrome(
         #         # executable_path='/usr/local/bin/geckodriver')
         #         executable_path='/Users/ziyikou/Downloads/chromedriver')
