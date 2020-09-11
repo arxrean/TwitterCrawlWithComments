@@ -6,6 +6,8 @@ import scrapy
 import os
 import pdb
 import pickle
+import urllib.request
+from PIL import Image
 from scrapy.http import Request
 from scrapy.selector import Selector
 from selenium import webdriver
@@ -39,7 +41,7 @@ class TwitterTree(scrapy.Spider):
     name = 'twitter_tree'
 
     def parse(self, response):
-        driver = webdriver.Chrome(executable_path='./chromedriver')
+        driver = webdriver.Chrome(executable_path='/Users/ziyikou/Code/twitter_conversation_crawler/chromedriver')
         # driver = webdriver.Chrome(
         #         # executable_path='/usr/local/bin/geckodriver')
         #         executable_path='/Users/ziyikou/Downloads/chromedriver')
@@ -48,77 +50,7 @@ class TwitterTree(scrapy.Spider):
         myElem = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, 'body')))
 
         time.sleep(5)
-
-        # pdb.set_trace()
-        # self.get_all_ids(driver)
-        # self.get_ids_one_page(driver)
         self.get_ids_all(driver)
-        # you can modify following number to make selenium get more tweets from the page
-
-            # for conversation in response.css(CONVERSATION_SELECTOR).extract_first()
-        #     pdb.set_trace()
-        #     count = 0
-        #     hxs = Selector(text=driver.page_source)
-        #     timeline = hxs.css("//div[@aria-label='Timeline: Conversation']")
-        #     owner_content = hxs.css('article')
-        #     # get the info of original tweet user
-        #     owner_content = hxs.css('div.permalink-inner.permalink-tweet-container').css('.TweetTextSize ::text').extract()
-        #     owner_name = hxs.css('.permalink-header').css('.username').css('b ::text').extract_first()
-        #     owner_link = 'https://twitter.com' + hxs.css('.permalink-inner').css('div ::attr(data-permalink-path)').extract_first()
-        #     owner_time= hxs.css('.permalink-header').css('.time').css('span ::attr(data-time)').extract_first()
-        #     yield {
-        #         'content': owner_content,
-        #         'username': owner_name,
-        #         'replyto': '',
-        #         # response.css('span[property="city"]::text')
-        #         'permalink': owner_link,
-        #         'time': owner_time
-        #     }
-        #     # traversal tweet conversations
-        #     for conversation in hxs.css('.ThreadedConversation') :
-        #         for tweets in conversation.css('.ThreadedConversation-tweet'):
-        #             count += 1
-        #             yield {
-        #                 'content': tweets.css('.content').css('.js-tweet-text-container').css('.TweetTextSize ::text').extract(),
-        #                 'username': tweets.css('.content').css('.stream-item-header').css('.username').css('b ::text').extract_first(),
-        #                 'replyto': tweets.css('.content').css('.ReplyingToContextBelowAuthor').css('.username').css('b ::text').extract(),
-        #                 # response.css('span[property="city"]::text')
-        #                 'permalink': 'https://twitter.com' + tweets.css('div ::attr(data-permalink-path)').extract_first(),
-        #                 'time': tweets.css('.content').css('.stream-item-header').css('.time').css(
-        #                     'span ::attr(data-time)').extract_first()
-        #             }
-
-        #     # traversal lone tweet
-
-        #     for conv_lone in hxs.css('.ThreadedConversation--loneTweet'):
-        #         count += 1
-        #         yield {
-        #             'content':  conv_lone.css('.content').css('.js-tweet-text-container').css('.TweetTextSize ::text').extract(),
-        #             'username': conv_lone.css('.content').css('.username').css('b ::text').extract_first(),
-        #             'replyto': conv_lone.css('.content').css('.ReplyingToContextBelowAuthor').css('.username').css(
-        #                 'b ::text').extract(),
-        #             'permalink': 'https://twitter.com' + conv_lone.css('div ::attr(data-permalink-path)').extract_first(),
-        #             'time': conv_lone.css('.content').css('.stream-item-header').css('.time').css('span ::attr(data-time)').extract_first()
-        #         }
-
-        #     print("count=" + str(count))
-        #     driver.close()
-        #     driver.quit()
-        #     # quit browser
-        # except Exception as e:
-        #     print("error happen:",e)
-        #     # self.driver.close()
-        #     # self.driver.quit()
-        #     print("quit browse success.")
-        # try:
-        #     self.driver.title
-        #     self.driver.quit()
-        #     print(True)
-        # except WebDriverException:
-        #     print(False)
-
-        # # input("Press Enter to continue...")
-        # print("Done!")
 
     def get_ids_all(self, driver):
         page = driver.find_element_by_tag_name('body')
