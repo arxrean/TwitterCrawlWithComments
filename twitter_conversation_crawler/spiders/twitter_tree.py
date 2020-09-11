@@ -42,10 +42,6 @@ class TwitterTree(scrapy.Spider):
 
     def parse(self, response):
         driver = webdriver.Chrome(executable_path='/Users/ziyikou/Code/twitter_conversation_crawler/chromedriver')
-        # driver = webdriver.Chrome(
-        #         # executable_path='/usr/local/bin/geckodriver')
-        #         executable_path='/Users/ziyikou/Downloads/chromedriver')
-        # executable_path = '/usr/local/bip repn/geckodriver'
         driver.get(response.url)
         myElem = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, 'body')))
 

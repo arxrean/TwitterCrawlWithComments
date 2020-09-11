@@ -19,20 +19,22 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 
 
 def crawl(line):
-	ids, label = line.strip().split(' ')
+	ids = line.strip()
 	all_ids = [ids]
+	all_reply = [-1]
+	all_has_img = [1]
 	ids = [ids]
 	while ids:
 		for id in ids:
-			os.system('scrapy crawl twitter_tree -a tweet_id={}'.format(id))
+			os.system('scrapy crawl twitter_recursion -a tweet_id={}'.format(id))
 
 		ids = []
-		pkls = glob.glob('*.pkl')
+		pkls = glob.glob('./result/*.pkl'.format(line.strip()))
 		for p in pkls:
 			with open(p, 'rb') as handle:
 				pkl = pickle.load(handle)
 			for item in pkl:
-				item, reply = item.split('-')
+				item, reply, has_img = item.split('-')
 				if 'K' in reply:
 					reply = reply.replace('K', '000')
 				reply = 0 if reply == '' or reply == '0' else int(reply)
@@ -41,32 +43,46 @@ def crawl(line):
 					continue
 				if item.isdigit():
 					all_ids.append(item)
-					try:
-						tweet = api.get_status(item, tweet_mode='extended')._json
-					except:
-						continue
-					tweet['reply_count'] = reply
-					with open('{}.json'.format(item), 'w') as f:
-						json.dump(tweet, f)
+					all_reply.append(reply)
+					all_has_img.append(has_img)
 					if reply > 0:
 						ids.append(item)
+
 			os.remove(p)
+
+	all_reply[0] = len(all_ids)-1
+	return all_ids, all_reply, all_has_img
 
 
 if __name__ == '__main__':
+	if not os.path.exists('./result'):
+		os.mkdir('./result')
+
 	for line in open('twitter_ids.txt', 'r').readlines():
-		if 'http' in line:
-			continue
-		id, label = line.strip().split(' ')
-		if os.path.exists('./result/{}_{}'.format(id, label)):
+		id = line.strip()
+		if os.path.exists('./result/{}'.format(id)):
 			continue
 
-		crawl(line)
-		os.mkdir('./result/{}_{}'.format(id, label))
-		os.mkdir('./result/{}_{}/comments'.format(id, label))
-		os.system('mv *.json ./result/{}_{}/comments'.format(id, label))
+		os.mkdir('./result/{}'.format(id))
 
-		tweet = api.get_status(id, tweet_mode='extended')._json
-		with open('{}.json'.format(id), 'w') as f:
-			json.dump(tweet, f)
-		os.system('mv {}.json ./result/{}_{}'.format(id, id, label))
+		all_comment_ids, all_reply_num, all_has_img = crawl(id)
+		for id2 in all_comment_ids:
+			os.mkdir('./result/{}/{}'.format(id, id2))
+
+		for i, _id in enumerate(all_comment_ids):
+			if _id == id:	
+				tweet = api.get_status(_id, tweet_mode='extended')._json
+			else:
+				try:
+					tweet = api.get_status(_id, tweet_mode='extended')._json
+				except:
+					continue
+
+			tweet['reply'] = all_reply_num[i]
+
+			with open('./result/{}/{}/{}.json'.format(id, _id, _id), 'w') as f:
+				json.dump(tweet, f)
+
+			if all_has_img[i] == 1:
+				os.system('scrapy crawl twitter_image -a tweet_id={}'.format(_id))
+				os.system('mv ./{}-* ./result/{}/{}'.format(_id, _id, _id))
