@@ -24,7 +24,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
 
 
-class TwitterSingle(scrapy.Spider):
+class TwitterRecursion(scrapy.Spider):
     def __init__(self, tweet_id=None):
         self.start_urls = [
             "https://twitter.com/Nigel21915926/status/%s" % tweet_id]
@@ -33,11 +33,11 @@ class TwitterSingle(scrapy.Spider):
         self.first_tweet = False
         self.bad_articles = []
 
-    name = 'twitter_single'
+    name = 'twitter_recursion'
 
     def parse(self, response):
         driver = webdriver.Chrome(
-            executable_path='./chromedriver')
+            executable_path='/Users/ziyikou/Code/twitter_conversation_crawler/chromedriver')
         driver.get(response.url)
         myElem = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.TAG_NAME, 'body')))
@@ -57,9 +57,7 @@ class TwitterSingle(scrapy.Spider):
         article = articles[0]
 
         imgs = self.get_img_link(article)
-        for i, img in enumerate(imgs):
-            t = img.format
-            img.save('./result-{}.{}'.format(i, t))
+        
 
     def get_img_link(self, article):
         link = article.find_elements_by_tag_name('img')
