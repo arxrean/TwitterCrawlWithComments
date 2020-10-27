@@ -21,7 +21,7 @@ scrapy crawl twitter_single -a tweet_id=1273569944081510400
 
 You can modify `get_single_tweet` function in `./twitter_conversation_crawler/spiders/twitter_single.py` to change the save path.
 
-### Crawl Images from Single Tweet Recursively
+### Crawl All Content and Comments from Single Tweet Recursively
 
 It crawls contens from a tweet recursively with its comments. The content includes text and image if the post or the comment has. You can add more ids in `twitter_ids.txt`. The results are in the `result` folder.
 
