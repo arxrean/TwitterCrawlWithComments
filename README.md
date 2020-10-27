@@ -1,12 +1,17 @@
 # Project
 
-Crawl the content of tweets without limitation.
+Crawl the content and comments of tweets based on tweet API.
 
 ### Environment
 
-- Mac OS
+- Mac OS/Linux
 - Chrome (others may be also fine)
 - Chromedriver (may need to be redownloaded from [here](https://chromedriver.chromium.org/downloads) depending on the version of your browser)
+
+### Setup
+
+- Please fill in your api key of tweet in `pipeline.py:Line7-10`.
+- If you are not using chrome, please change the path of your browser driver in `twitter_conversation_crawler/spiders/*.py`. 
 
 ### Crawl Images from Single Tweet
 
